@@ -1,7 +1,10 @@
 #include <Python.h>
 
 // Wrapper method for python function 
-int complex_calc(const char* s) {
+#include <Python.h>
+#include "clip_api.h"
+// Wrapper method for python function 
+int clip_label(const char* s) {
     PyObject *pModule = NULL, *pFunc = NULL, *pArgs = NULL, *pRes = NULL;
     int res = -1;
 
@@ -51,18 +54,17 @@ cleanup:
 
     return res;
 }
-
 // Main
 int main() {
     // Init Python interpreter
 
     Py_Initialize();
-    wchar_t *path = Py_DecodeLocale("/home/fourcolor/Documents/db112/final/:", NULL);
+    wchar_t *path = Py_DecodeLocale("/mysqludf/", NULL);
     PySys_SetPath(path);
     // PyObject* sysPath = PySys_GetObject("/home/fourcolor/Documents/db112/final/");
     // PyList_Append(sysPath, PyUnicode_DecodeFSDefault("."));
     // Call Python function
-    printf("%d\n", complex_calc("img.png"));
+    printf("%d\n", clip_label("img.png"));
 
     // Frees memory allocated by Python interpreter 
     Py_Finalize();

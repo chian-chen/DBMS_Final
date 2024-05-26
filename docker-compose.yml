@@ -5,6 +5,10 @@ services:
     container_name: mysql_udf
     ports:
       - "26425:3306"
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_NICE
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=test
@@ -17,4 +21,4 @@ services:
     image: phpmyadmin
     restart: always
     ports:
-      - 26425:80
+      - 26426:80

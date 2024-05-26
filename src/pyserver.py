@@ -1,18 +1,12 @@
-import sys
-# sys.path.append
-# sys.path = ['/home/fourcolor/Documents/db112/final', '/usr/lib/python310.zip', '/usr/lib/python3.10', '/usr/lib/python3.10/lib-dynload', '/home/fourcolor/.local/lib/python3.10/site-packages', '/usr/local/lib/python3.10/dist-packages', '/usr/local/lib/python3.10/dist-packages/MobileInsight-6.0.0-py3.10-linux-x86_64.egg', '/home/fourcolor/Documents/p4-utils', '/usr/lib/python3/dist-packages', '/usr/lib/python3/dist-packages/bcc-0.28.0+bc9b43a0-py3.10.egg']
-import os
-sys.path = ['/mysqludf/', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/usr/local/lib/python3.11/dist-packages', '/usr/lib/python3/dist-packages']
-print(sys.path)
+import socketserver
 import clip
 import torch
 from torchvision.datasets import CIFAR100
 from torchvision.utils import save_image
 from PIL import Image  
-import PIL
-
-def api(path):
-    device =  "cpu"
+import os
+def clip_api(path):
+    device = "cpu"
     model, preprocess = clip.load('ViT-B/32', device, download_root="/mysqludf/cache/clip")
     cifar100 = CIFAR100(root=os.path.expanduser("/mysqludf/cache"), download=True)
     image = Image.open(path)
@@ -30,7 +24,21 @@ def api(path):
     values, indices = similarity[0].topk(5)
 
     # Print the result
-    return indices[0]
+    return indices[0].item()
 
+class MyTCPHandler(socketserver.BaseRequestHandler):
+    def handle(self):
+        data =  self.request.recv(1024).decode().split(":")
+        if data[0] == "path":
+            path = data[1]
+            path = bytes(path.encode())[:-1].decode()
+            result = clip_api(path)
+            self.request.sendall(str(result).encode())
+        
 
-api("/mysqludf/img.png")
+# 创建服务器，绑定 IP 地址和端口号
+HOST, PORT = "localhost", 9999
+server = socketserver.ThreadingTCPServer((HOST, PORT), MyTCPHandler)
+
+# 启动服务器
+server.serve_forever()
