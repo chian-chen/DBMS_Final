@@ -9,7 +9,7 @@ https://dev.mysql.com/doc/extending-mysql/8.0/en/adding-loadable-function.html
 #include <netinet/in.h>
 #include <unistd.h> // read(), write(), close()
 #include <mysql.h>
-#include "clip_api.h"
+// #include "clip_api.h"
 #include <stdio.h>
 // Call xxx_init() to let the aggregate function allocate any memory it needs for storing results.
 // The initialization function for xxx().
@@ -41,7 +41,7 @@ long long clip(UDF_INIT *initid, UDF_ARGS *args,
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
         printf("socket creation failed...\n");
-        exit(0);
+        return -1;
     }
     else
         printf("Socket successfully created..\n");
@@ -51,10 +51,12 @@ long long clip(UDF_INIT *initid, UDF_ARGS *args,
     if (connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr))
         != 0) {
         printf("connection with the server failed...\n");
-        exit(0);
+         return -1;
     }
     else
         printf("connected to the server..\n");
-    int result = send_path(sockfd, "path:/mysqludf/img.png");
+    char cmd[100] = "path:";
+    char *ptr = strcat(cmd,args->args[0]);
+    int result = send_path(sockfd, ptr);
     return result;
 }

@@ -20,5 +20,18 @@ services:
   adminer:
     image: phpmyadmin
     restart: always
+    environment:
+      - PMA_HOST=mysql_udf
+      - PMA_PORT=3306
     ports:
       - 26426:80
+
+  workbench:
+    image: lscr.io/linuxserver/mysql-workbench:latest
+    restart: always
+    environment:
+      PGID: 1000
+      PUID: 1000
+    ports:
+      - 3001:3001
+      - 3000:3000

@@ -30,6 +30,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         data =  self.request.recv(1024).decode().split(":")
         if data[0] == "path":
+            print(data)
             path = data[1]
             path = bytes(path.encode())[:-1].decode()
             result = clip_api(path)
