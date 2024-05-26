@@ -1,0 +1,20 @@
+version: "3"
+services:
+  mysql_udf:
+    build: .
+    container_name: mysql_udf
+    ports:
+      - "26425:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=test
+    volumes:
+      - ./db/data/:/var/lib/mysql
+      - ./src/:/mysqludf
+      - ./db/cache:/mysqludf/cache
+
+  adminer:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 26425:80
