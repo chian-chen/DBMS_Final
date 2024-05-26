@@ -1,14 +1,5 @@
 
-CREATE DATABASE IF NOT EXISTS TEST;
-USE TEST;
-
-CREATE TABLE IF NOT EXISTS image (
-    imgID INT PRIMARY KEY,
-	image_path VARCHAR(100),
-    C1 INT DEFAULT -1, 
-    C2 INT DEFAULT -1,
-    C3 INT DEFAULT -1
-);
+USE imageDB;
 
 DELIMITER //
 CREATE PROCEDURE SplitString(
@@ -32,38 +23,28 @@ DELIMITER ;
 
 DELIMITER //
 
-CREATE FUNCTION clip(input_path VARCHAR(255)) RETURNS VARCHAR(255)
-DETERMINISTIC
-BEGIN
-    -- Implementation of the function that modifies the input_path and returns a result
-    RETURN CONCAT('1', input_path);
-END //
-
-DELIMITER ;
-
-
-DELIMITER //
-
 CREATE TRIGGER BeforeImageInsert
-BEFORE INSERT ON image
+BEFORE INSERT ON image_table
 FOR EACH ROW
 BEGIN
     -- Calling the 'clip' function with the 'path' column of the new row and storing the result
-    SET @result = clip(NEW.image_path);
+    SET @result = clip(NEW.img_path);
     CALL SplitString(@result, @part1, @part2, @part3);
     
-    SET NEW.C1 = CONVERT(@part1, UNSIGNED INTEGER);
-    SET NEW.C2 = CONVERT(@part2, UNSIGNED INTEGER);
-    SET NEW.C3 = CONVERT(@part3, UNSIGNED INTEGER);
+    SET NEW.img_type1 = CONVERT(@part1, UNSIGNED INTEGER);
+    SET NEW.img_type2 = CONVERT(@part2, UNSIGNED INTEGER);
+    SET NEW.img_type3 = CONVERT(@part3, UNSIGNED INTEGER);
     
     -- Note: NEW refers to the row that is about to be inserted.
     -- Here, we modify 'processed_path' directly before the row is actually inserted into the database.
 END //
 
 DELIMITER ;
-
-INSERT INTO image (imgID, image_path) VALUES (1, '12/23/22');
-SELECT * FROM image;
+-- Change the path
+INSERT INTO image_table (img_path) VALUES ('/mysqludf/img/n02124075/n02124075_428.JPEG'); 
+INSERT INTO image_table (img_path) VALUES ('/mysqludf/img/n02124075/n02124075_1183.JPEG'); 
+INSERT INTO image_table (img_path) VALUES ('/mysqludf/img/n01833805/n01833805_169.JPEG'); 
+SELECT * FROM image_table;
 
 
 -- test procedure 

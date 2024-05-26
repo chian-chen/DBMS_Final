@@ -1,17 +1,18 @@
 import socketserver
 import clip
 import torch
-from torchvision.datasets import CIFAR100
-from torchvision.utils import save_image
 from PIL import Image  
 import os
 def clip_api(path):
+    print(path)
+    class_names = ["airliner", "sports_car", "hummingbird", "Egyptian_cat", "Ox"
+                "golden_retriever", "tailed_frog", "zebra", "container_ship", "trailer_truck"
+                ]
     device = "cpu"
     model, preprocess = clip.load('ViT-B/32', device, download_root="/mysqludf/cache/clip")
-    cifar100 = CIFAR100(root=os.path.expanduser("/mysqludf/cache"), download=True)
     image = Image.open(path)
     image_input = preprocess(image).unsqueeze(0).to(device)
-    text_inputs = torch.cat([clip.tokenize(f"a photo of a {c}") for c in cifar100.classes]).to(device)
+    text_inputs = torch.cat([clip.tokenize(f"a photo of a {c}") for c in class_names]).to(device)
     # Calculate features
     with torch.no_grad():
         image_features = model.encode_image(image_input)
@@ -24,7 +25,7 @@ def clip_api(path):
     values, indices = similarity[0].topk(5)
 
     # Print the result
-    return indices[0].item()
+    return str(indices[0].item() + 1) + '/' + str(indices[1].item() + 1) + '/' + str(indices[2].item() + 1)
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
@@ -34,12 +35,11 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             path = data[1]
             path = bytes(path.encode())[:-1].decode()
             result = clip_api(path)
+            print(result)
             self.request.sendall(str(result).encode())
         
 
-# 创建服务器，绑定 IP 地址和端口号
 HOST, PORT = "localhost", 9999
 server = socketserver.ThreadingTCPServer((HOST, PORT), MyTCPHandler)
 
-# 启动服务器
 server.serve_forever()
