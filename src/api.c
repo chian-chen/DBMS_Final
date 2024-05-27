@@ -2,7 +2,7 @@
 
 // Wrapper method for python function 
 #include <Python.h>
-#include "clip_api.h"
+// #include "clip_api.h"
 // Wrapper method for python function 
 int clip_label(const char* s) {
     PyObject *pModule = NULL, *pFunc = NULL, *pArgs = NULL, *pRes = NULL;
