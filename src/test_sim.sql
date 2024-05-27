@@ -15,6 +15,7 @@ VALUES ("/mysqludf/img.png"),
 
 SELECT * FROM images;
 SELECT img_name, image_sim(img_name, './img.png') AS sim FROM images;
+SELECT img_name FROM images WHERE image_sim(img_name, './img.png') > 0.8;
 
 
 
