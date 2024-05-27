@@ -1,0 +1,6 @@
+db/
+imgs/
+src/strcat*
+src/myapp
+src/con.c
+src/cache/*
