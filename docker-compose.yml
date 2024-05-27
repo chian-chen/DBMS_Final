@@ -12,6 +12,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=test
+    restart: always
     volumes:
       - ./db/data/:/var/lib/mysql
       - ./src/:/mysqludf
