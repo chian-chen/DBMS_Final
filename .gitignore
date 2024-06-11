@@ -1,0 +1,7 @@
+db/
+imgs/
+src/strcat*
+src/myapp
+src/con.c
+src/cache/*
+src/log_udf.c
