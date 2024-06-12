@@ -1,5 +1,6 @@
 
 USE imageDB;
+CREATE FUNCTION clip RETURNS STRING SONAME 'clip_api.so';
 
 DELIMITER //
 CREATE PROCEDURE SplitString(

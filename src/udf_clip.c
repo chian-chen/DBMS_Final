@@ -35,7 +35,7 @@ char *clip(UDF_INIT *initid, UDF_ARGS *args,
           char *is_null, char *error){
     int sockfd;
     struct sockaddr_in servaddr;
-
+    
     // Create socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {

@@ -11,13 +11,39 @@ https://dev.mysql.com/doc/extending-mysql/8.0/en/adding-loadable-function.html
 #include <mysql.h>
 // #include "clip_api.h"
 #include <stdio.h>
+#include <ctype.h>
+
+// Function to check if the string contains ".png"
+int contains_image_extension(const char *str) {
+    const char *extensions[] = { ".png", ".jpeg" };
+    size_t num_extensions = sizeof(extensions) / sizeof(extensions[0]);
+
+    // Convert the input string to lower case
+    char lower_str[256];
+    strncpy(lower_str, str, sizeof(lower_str) - 1);
+    lower_str[sizeof(lower_str) - 1] = '\0';
+    for (char *p = lower_str; *p; ++p) {
+        *p = tolower((unsigned char)*p);
+    }
+
+    // Check for each extension
+    for (size_t i = 0; i < num_extensions; ++i) {
+        if (strstr(lower_str, extensions[i]) != NULL) {
+            return 1; // Extension found
+        }
+    }
+
+    return 0; // No extensions found
+}
+
+
 // Call xxx_init() to let the aggregate function allocate any memory it needs for storing results.
 // The initialization function for xxx().
 bool image_sim_init(UDF_INIT *initid, UDF_ARGS *args, char *message) {
-    if (args->arg_count != 2) {
-        strcpy(message, "load_image() requires exactly two arguments: column_value and image_path");
-        return 1;
-    }
+    // if (args->arg_count != 2) {
+    //     strcpy(message, "load_image() requires exactly two arguments: column_value and image_path");
+    //     return 1;
+    // }
 
     if (args->arg_type[0] != STRING_RESULT || args->arg_type[1] != STRING_RESULT) {
         strcpy(message, "load_image() requires both arguments to be strings");
@@ -49,10 +75,35 @@ double image_sim(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *
     const char *column_value = args->args[0];
     const char *image_path = args->args[1];
 
+    // Determine if image_path contains ".png"
+    const char *prefix = "sim:";
+    const char *sim_str = "sim_str:";
+    // const char *result_prefix = contains_png(image_path) ? prefix : sim_str;
+
+    const char *result_prefix;
+
+    if (args->arg_count == 3) {
+        if(strcmp(args->args[2],"PSNR") == 0){
+            result_prefix = "sim_psnr:";
+        }
+        else if (strcmp(args->args[2],"SSIM") == 0){
+            result_prefix = "sim_ssim:";
+        }
+        else if (strcmp(args->args[2],"LPIPS") == 0){
+            result_prefix = "sim_lpips:";
+        }
+        else{
+            result_prefix = "sim:";
+        }
+    }
+    else{
+        result_prefix = contains_image_extension(image_path) ? prefix : sim_str;
+    }
+
     // Calculate the length of the concatenated string
     size_t len_column_value = strlen(column_value);
     size_t len_image_path = strlen(image_path);
-    size_t len_result = len_column_value + len_image_path + 2; // +2 for '_' and '\0'
+    size_t len_result = strlen(result_prefix) + len_column_value + len_image_path + 2; // +2 for '_' and '\0'
 
     // Allocate memory for the concatenated string
     char *result_str = (char *)malloc(len_result);
@@ -62,9 +113,9 @@ double image_sim(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *
     }
 
     // Concatenate the strings with an underscore in the middle
-    strcpy(result_str, "sim:");
+    strcpy(result_str, result_prefix);
     strcat(result_str, column_value);
-    strcat(result_str, "_");
+    strcat(result_str, "$");
     strcat(result_str, image_path);
 
     // Socket
