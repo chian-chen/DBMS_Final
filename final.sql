@@ -1,13 +1,6 @@
 CREATE DATABASE demoImageDB;
 use demoImageDB;
 
--- SHOW TABLES;
--- SELECT ROUTINE_NAME
--- FROM information_schema.ROUTINES
--- WHERE ROUTINE_TYPE = 'FUNCTION' AND ROUTINE_SCHEMA = 'database_name';
--- SHOW TRIGGERS;
--- SHOW PROCEDURE STATUS WHERE Db = 'imageDB';
-
 -- User Define Function 
 CREATE FUNCTION image_sim RETURNS REAL SONAME 'sim_api.so';
 CREATE  FUNCTION clip RETURNS STRING SONAME 'clip_api.so';
@@ -95,39 +88,29 @@ END$$
 DELIMITER ;
 
 -- DEMO
+-- Image path should be replaced to the path in your own system
 
 -- insert an image and show its auto-tagging results
--- /mysqludf/imgs/n02099601/n02099601_268.JPEG
 INSERT INTO image_table (img_path) VALUES ('/mysqludf/imgs/n02124075/n02124075_428.JPEG'); 
 SELECT * FROM image_table;
 
 -- insert some images to show other functions
-
 INSERT INTO image_table (img_path) VALUES ('/mysqludf/imgs/n02124075/n02124075_1183.JPEG'); 
 INSERT INTO image_table (img_path) VALUES ('/mysqludf/imgs/n01833805/n01833805_169.JPEG'); 
 
 -- Similarity Search by another image
-
 SELECT img_path, image_sim(img_path, '/mysqludf/imgs/n02124075/n02124075_1183.JPEG') AS sim FROM image_table;
 
 -- Setting a real number threshold
-
 SELECT img_path FROM image_table WHERE image_sim(img_path, '/mysqludf/imgs/n02124075/n02124075_1183.JPEG') > 0.8;
 
 -- use text to search
-
 SELECT img_path, image_sim(img_path, 'A cat') AS Sim FROM image_table WHERE image_sim(img_path, 'A cat') > 0;
 
 -- More Similarity Algorithm
-
 SELECT img_path, image_sim(img_path, '/mysqludf/imgs/n02124075/n02124075_1183.JPEG', 'LPIPS') AS Sim_LPIPS FROM image_table;
 SELECT img_path, image_sim(img_path, '/mysqludf/imgs/n02124075/n02124075_1183.JPEG', 'PSNR') AS Sim_PSNR FROM image_table;
 SELECT img_path, image_sim(img_path, '/mysqludf/imgs/n02124075/n02124075_1183.JPEG', 'SSIM') AS Sim_SSIM FROM image_table;
-
--- faster_sim
-SET @image_path = '/mysqludf/imgs/n02124075/n02124075_1183.JPEG';
-CALL fastest_sim(@image_path);
-
 
 -- Large Data Experiments are shown in a python notebook named experiments.ipynb
 
