@@ -1,0 +1,42 @@
+{
+"n02690373": {
+    "class_name" : "airliner",
+    "number": 1
+},
+"n04285008":{
+    "class_name" : "sports_car",
+    "number": 2
+},
+"n01833805":{
+    "class_name" : "hummingbird", 
+    "number": 3
+},
+"n02124075":{
+    "class_name" : "Egyptian_cat", 
+    "number": 4
+},
+"n02403003":{
+    "class_name" : "Ox",
+    "number": 5
+},
+"n02099601":{
+    "class_name" : "golden_retriever",
+    "number": 6
+},
+"n01644900":{
+    "class_name" : "tailed_frog",
+    "number": 7
+},
+"n02391049":{
+    "class_name" : "zebra",
+    "number": 8
+},
+"n03095699":{
+    "class_name" : "container_ship",
+    "number": 9
+},
+"n04467665":{
+    "class_name" : "trailer_truck",
+    "number": 10
+}
+}

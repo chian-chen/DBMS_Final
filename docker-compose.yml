@@ -1,0 +1,28 @@
+version: "3"
+services:
+  mysql_udf:
+    build: .
+    container_name: mysql_udf
+    ports:
+      - "3306:3306"
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_NICE
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=test
+    restart: always
+    volumes:
+      - ./db/data/:/var/lib/mysql
+      - ./src/:/mysqludf
+      - ./db/cache:/mysqludf/cache
+
+  adminer:
+    image: phpmyadmin
+    restart: always
+    environment:
+      - PMA_HOST=mysql_udf
+      - PMA_PORT=3306
+    ports:
+      - 8081:80
